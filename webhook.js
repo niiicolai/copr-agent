@@ -48,7 +48,7 @@ app.post('/webhook-event', webhookMiddleware, async (req, res) => {
       const mention = `@${BOT_HANDLE}`;
       if (comment.body.includes(mention)) {
         await reviewQueue.add("reply-comment", { payload: req.body });
-        logger.info({ issue: comment.issue.number }, "Comment reply queued");
+        logger.info({ issue: comment.id }, "Comment reply queued");
       }
     }
     
