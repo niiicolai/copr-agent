@@ -16,7 +16,11 @@ export function webhookMiddleware(req, res, next) {
 
   const hmac = crypto.createHmac("sha256", secret);
 
-  const digest = "sha256=" + hmac.update(req.body.payload).digest("hex");
+  if (!req.rawBody) {
+    return res.status(401).send("Missing raw body");
+  }
+
+  const digest = "sha256=" + hmac.update(req.rawBody).digest("hex");
 
   const sigBuffer = Buffer.from(signature);
   const digestBuffer = Buffer.from(digest);
