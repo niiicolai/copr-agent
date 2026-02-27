@@ -1,13 +1,17 @@
 import jwt from "jsonwebtoken";
+import fs from "fs";
+import path from "path";
 
 const GITHUB_API = "https://api.github.com";
 const OLLAMA_API = `${process.env.OLLAMA_URL}/api/generate`;
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL;
 
+const appId = process.env.GITHUB_APP_ID;
+const privateKey = fs.readFileSync(path.join(process.cwd(), "private-key.pem"), "utf8");
+
 export async function processPR(payload) {
   const { repository, pull_request, installation } = payload;
 
-    console.log(repository, pull_request, installation)
   const owner = repository.owner.login;
   const repo = repository.name;
   const pullNumber = pull_request.number;
@@ -25,7 +29,6 @@ export async function processPR(payload) {
   );
 
   const files = await filesRes.json();
-
   const reviewableFiles = files.filter(
     f =>
       f.status !== "removed" &&
@@ -33,21 +36,29 @@ export async function processPR(payload) {
       f.filename.match(/\.(js|ts|py|go|java|tsx|rs)$/)
   );
 
+  const allComments = [];
+
   for (const file of reviewableFiles) {
     const comments = await reviewFileWithLLM(file);
 
     for (const comment of comments) {
-      await postReviewComment({
-        token,
-        owner,
-        repo,
-        pullNumber,
-        commitId: pull_request.head.sha,
+      allComments.push({
         path: file.filename,
         body: comment.comment,
         line: comment.line,
       });
     }
+  }
+
+  if (allComments.length > 0) {
+    await postReviewComments({
+      token,
+      owner,
+      repo,
+      pullNumber,
+      commitId: pull_request.head.sha,
+      comments: allComments,
+    });
   }
 }
 
@@ -96,8 +107,6 @@ ${file.patch}
 }
 
 async function getInstallationToken(installationId) {
-  const appId = process.env.GITHUB_APP_ID;
-  const privateKey = process.env.GITHUB_PRIVATE_KEY;
 
   const appJwt = jwt.sign(
     {
@@ -108,7 +117,7 @@ async function getInstallationToken(installationId) {
     privateKey,
     { algorithm: "RS256" }
   );
-
+  
   const res = await fetch(
     `https://api.github.com/app/installations/${installationId}/access_tokens`,
     {
@@ -122,4 +131,27 @@ async function getInstallationToken(installationId) {
 
   const data = await res.json();
   return data.token;
+}
+
+async function postReviewComments({ token, owner, repo, pullNumber, commitId, comments }) {
+  const res = await fetch(
+    `${GITHUB_API}/repos/${owner}/${repo}/pulls/${pullNumber}/reviews`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+      body: JSON.stringify({
+        event: "COMMENT",
+        commit_id: commitId,
+        comments: comments.map(c => ({
+          path: c.path,
+          line: c.line,
+          body: c.body,
+        })),
+      }),
+    }
+  );
+  return res.json();
 }
