@@ -2,14 +2,14 @@ const requiredEnvVars = [
   'REDIS_URL',
   'GITHUB_APP_ID',
   'GITHUB_WEBHOOK_SECRET',
-  'OLLAMA_URL',
-  'OLLAMA_MODEL',
+  'OPENAI_API_KEY',
 ];
 
 const optionalEnvVars = [
   'WEB_PORT',
-  'OPENAI_API_KEY',
   'GITHUB_APP_HANDLE',
+  'OLLAMA_URL',
+  'OLLAMA_MODEL',
 ];
 
 export function validateConfig() {
