@@ -5,6 +5,7 @@ import { webhookMiddleware } from "./src/middleware/webhook_middleware.js";
 
 const port = process.env.WEB_PORT;
 const app = express();
+const BOT_HANDLE = process.env.GITHUB_APP_HANDLE;
 
 app.use(express.json({
   limit: '50kb',
@@ -15,10 +16,17 @@ app.use(express.json({
 
 app.post('/webhook-event', webhookMiddleware, async (req, res) => {
   try {
-    const { action, pull_request } = req.body;
+    const { action, pull_request, comment } = req.body;
 
     if (pull_request && (action === 'opened' || action === 'synchronize')) {
       await reviewQueue.add("review-pr", { payload: req.body });
+    }
+
+    if (comment && action === 'created' && BOT_HANDLE) {
+      const mention = `@${BOT_HANDLE}`;
+      if (comment.body.includes(mention)) {
+        await reviewQueue.add("reply-comment", { payload: req.body });
+      }
     }
     
     res.sendStatus(204);

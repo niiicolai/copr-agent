@@ -168,3 +168,47 @@ async function postReviewComments({ token, owner, repo, pullNumber, commitId, co
   console.log("Review response:", data);
   return data;
 }
+
+export async function replyToComment(payload) {
+  const { repository, comment, installation } = payload;
+
+  const owner = repository.owner.login;
+  const repo = repository.name;
+
+  const issueNumber = comment.issue_url.split('/').pop();
+
+  const token = await getInstallationToken(installation.id);
+
+  const prompt = `
+You are a helpful coding assistant. Answer the user's question about the code.
+
+Conversation:
+${comment.user.login}: ${comment.body}
+
+Provide a helpful response.
+`;
+
+  const response = await llm.invoke(prompt);
+  const replyBody = response.content;
+
+  const res = await fetch(
+    `${GITHUB_API}/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+      body: JSON.stringify({
+        body: replyBody,
+      }),
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`Failed to post reply: ${JSON.stringify(err)}`);
+  }
+
+  console.log("Reply posted:", await res.json());
+}
