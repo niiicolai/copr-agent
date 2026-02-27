@@ -6,7 +6,6 @@ AI-powered GitHub Pull Request reviewer and comment responder bot.
 
 - **Automated PR Reviews** - Analyzes pull request diffs using LLM and posts review comments
 - **Comment Replies** - Responds to mentions in issues/PRs using AI
-- **Production Ready** - Includes rate limiting, graceful shutdown, structured logging, and Docker support
 
 ## Requirements
 
