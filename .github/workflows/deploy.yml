@@ -45,6 +45,6 @@ jobs:
           docker-compose -f compose.yml down
           docker-compose -f compose.yml up -d
           docker image prune -f
-    
+
     - name: Remove .env file
       run: rm .env
