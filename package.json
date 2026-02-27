@@ -1,0 +1,20 @@
+{
+  "name": "review-agent",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "webhook": "node ./webhook.js",
+    "worker": "node ./worker.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate:secret": "node ./src/scripts/generate_secret.js"
+  },
+  "dependencies": {
+    "bullmq": "^5.70.1",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1"
+  }
+}
