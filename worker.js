@@ -5,6 +5,7 @@ new Worker(
   "review",
   async job => {
     if (job.name === 'review-pr') {
+    console.log(job.data)
         await processPR(job.data.payload);
     }
   },

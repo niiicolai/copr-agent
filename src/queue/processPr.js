@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import jwt from "jsonwebtoken";
 
 const GITHUB_API = "https://api.github.com";
@@ -8,6 +7,7 @@ const OLLAMA_MODEL = process.env.OLLAMA_MODEL;
 export async function processPR(payload) {
   const { repository, pull_request, installation } = payload;
 
+    console.log(repository, pull_request, installation)
   const owner = repository.owner.login;
   const repo = repository.name;
   const pullNumber = pull_request.number;

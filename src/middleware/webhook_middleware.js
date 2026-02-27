@@ -15,6 +15,7 @@ export function webhookMiddleware(req, res, next) {
   }
 
   const hmac = crypto.createHmac("sha256", secret);
+  console.log(req.body)
   const digest = "sha256=" + hmac.update(req.rawBody).digest("hex");
 
   const sigBuffer = Buffer.from(signature);
