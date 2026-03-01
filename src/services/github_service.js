@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
-import logger from "../logger.js";
+import logger from "../config/logger.js";
 
 const GITHUB_API = "https://api.github.com";
 const GITHUB_PRIVATE_KEY = process.env.GITHUB_PRIVATE_KEY
@@ -39,6 +39,25 @@ export async function getInstallationToken(installationId) {
     return data.token;
 }
 
+export async function getPullRequestFiles({ token, owner, repo, pullNumber }) {
+  const res = await fetch(
+    `${GITHUB_API}/repos/${owner}/${repo}/pulls/${pullNumber}/files`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`Failed to get PR files: ${JSON.stringify(err)}`);
+  }
+
+  return res.json();
+}
+
 export async function postReviewComments({ token, owner, repo, pullNumber, commitId, comments }) {
   const body = comments.map(c => `**${c.path}:${c.line}**\n${c.body}`).join("\n\n---\n\n");
 
@@ -69,25 +88,6 @@ export async function postReviewComments({ token, owner, repo, pullNumber, commi
   return data;
 }
 
-export async function getPullRequestFiles({ token, owner, repo, pullNumber }) {
-  const res = await fetch(
-    `${GITHUB_API}/repos/${owner}/${repo}/pulls/${pullNumber}/files`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/vnd.github+json",
-      },
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.json();
-    throw new Error(`Failed to get PR files: ${JSON.stringify(err)}`);
-  }
-
-  return res.json();
-}
-
 export async function postComment({ token, owner, repo, issueNumber, body }) {
   const res = await fetch(
     `${GITHUB_API}/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
@@ -108,5 +108,44 @@ export async function postComment({ token, owner, repo, issueNumber, body }) {
 
   const data = await res.json();
   logger.info({ owner, repo, issueNumber, commentId: data.id }, "Comment posted");
+}
+
+export async function searchCode({ token, owner, repo, query }) {
+
+  const res = await fetch(
+    `${GITHUB_API}/search/code?q=${encodeURIComponent(query)}+repo:${owner}/${repo}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`Search failed: ${JSON.stringify(err)}`);
+  }
+
+  return res.json();
+}
+
+export async function getFileContent({ token, owner, repo, path }) {
+  const res = await fetch(
+    `${GITHUB_API}/repos/${owner}/${repo}/contents/${path}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/vnd.github+json",
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(`Failed to get file: ${JSON.stringify(err)}`);
+  }
+
+  return res.json();
 }
 
