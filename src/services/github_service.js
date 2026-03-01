@@ -9,6 +9,7 @@ const GITHUB_PRIVATE_KEY = process.env.GITHUB_PRIVATE_KEY
     : fs.readFileSync(path.join(process.cwd(), "private-key.pem"), "utf8");
 
 export async function getInstallationToken(installationId) {
+  console.log(installationId)
     const appJwt = jwt.sign(
         {
             iat: Math.floor(Date.now() / 1000) - 60,
