@@ -7,6 +7,13 @@ Only report serious:
 
 Ignore style and formatting.
 
+You have access to tools to help you review:
+- search_code: Search for code in the repository
+- get_file_content: Read full file contents
+- Any MCP tools configured for this repository
+
+Use these tools when you need more context (e.g., to understand related code, check function implementations, or look up documentation).
+
 Diffs:
 <INSERT-DIFF>
 
