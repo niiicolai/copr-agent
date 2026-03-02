@@ -10,6 +10,16 @@ import {
   createDeleteOldMessagesMiddleware 
 } from "./middleware.js";
 
+let checkpointer = null;
+async function getCheckpointer() {
+  if (!checkpointer) {
+    checkpointer = SqliteSaver.fromConnString(
+      process.env.SQLITE_CHECKPOINT_PATH || "./checkpoints.db"
+    );
+  }
+  return checkpointer;
+}
+
 const middleware = [];
 const tools = [];
 const options = { model, middleware, tools, recursionLimit: 10 };
@@ -41,8 +51,7 @@ if (tools.length > 0) {
 }
 
 if (ENABLE_SHORT_TERM_MEMORY) {
-  const checkpointer = SqliteSaver.fromConnString(process.env.SQLITE_CHECKPOINT_PATH || "./checkpoints.db");
-  options.checkpointer = checkpointer;
+  options.checkpointer = getCheckpointer();
   middleware.push(createMiddleware({ 
     name: "DeleteOldMessages", 
     beforeModel: createDeleteOldMessagesMiddleware 
