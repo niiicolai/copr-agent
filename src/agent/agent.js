@@ -1,7 +1,8 @@
 import { createAgent, createMiddleware } from "langchain";
 import { SqliteSaver } from "@langchain/langgraph-checkpoint-sqlite";
-import { tools as mcpTools } from "./mcpClient.js";
+import { tools as mcpTools } from "./mcp_client.js";
 import { searchCode, getFileContent } from "./tools.js";
+import { retrieve } from "./vector_store.js";
 import { model } from "./llm.js";
 import logger from "../config/logger.js";
 import { 
@@ -24,6 +25,7 @@ const middleware = [];
 const tools = [];
 const options = { model, middleware, tools, recursionLimit: 10 };
 
+const ENABLE_RAG_TOOL = parseInt(process.env.ENABLE_RAG_TOOL ?? 0) === 1;
 const ENABLE_MCP_CLIENT = parseInt(process.env.ENABLE_MCP_CLIENT ?? 0) === 1;
 const ENABLE_SEARCH_TOOLS = parseInt(process.env.ENABLE_SEARCH_TOOLS ?? 1) === 1;
 const ENABLE_SHORT_TERM_MEMORY = parseInt(process.env.ENABLE_SHORT_TERM_MEMORY ?? 0) === 1;
@@ -36,6 +38,10 @@ if (ENABLE_SEARCH_TOOLS) {
 
 if (ENABLE_MCP_CLIENT) {
   tools.push(...mcpTools);
+}
+
+if (ENABLE_RAG_TOOL) {
+  tools.push(...retrieve);
 }
 
 middleware.push(createMiddleware({ 
