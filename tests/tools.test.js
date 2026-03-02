@@ -4,6 +4,11 @@ import { searchCode, getFileContent } from '../src/agent/tools.js';
 import searchCodeMock from '../tests/data/search_code.js';
 import getFileContentMock from '../tests/data/get_file_content.js';
 
+vi.mock('jsonwebtoken', () => ({
+  default: { sign: vi.fn(() => 'mock-jwt-token') },
+  sign: vi.fn(() => 'mock-jwt-token')
+}));
+
 vi.stubGlobal('fetch', vi.fn());
 
 describe('tools.js', () => {
