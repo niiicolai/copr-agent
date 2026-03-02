@@ -1,8 +1,8 @@
 import { Redis } from "ioredis";
 
-const redis = new Redis(process.env.REDIS_URL);
+export const redis = new Redis(process.env.REDIS_URL);
 
-const TOKEN_KEY = "tokens:spent";
+export const TOKEN_KEY = "tokens:spent";
 
 export async function addTokens(inputTokens, outputTokens) {
   const pipeline = redis.pipeline();

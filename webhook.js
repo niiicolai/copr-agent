@@ -68,7 +68,7 @@ app.post('/webhook-event', webhookMiddleware, async (req, res) => {
       const mention = `@${BOT_HANDLE}`;
       const issueNumber = comment.issue_url?.split('/')?.pop();
 
-      if (comment.body.includes(mention) && !isNaN(issueNumber)) {
+      if (comment.user.login !== BOT_HANDLE && comment.body.includes(mention) && !isNaN(issueNumber)) {
         await reviewQueue.add("reply-comment", { payload: { ...req.body, issueNumber } });
         logger.info({ issue: issueNumber }, "Comment reply queued");
       }

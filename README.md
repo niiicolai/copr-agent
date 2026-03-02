@@ -85,7 +85,7 @@ Configure file limits and batch sizes to optimize API usage and avoid rate limit
 2. Configure:
    - **Homepage URL**: Your app's URL
    - **Webhook URL**: Your server URL + `/webhook-event`
-   - **Webhook secret**: `npm run generate:secret`
+   - **Webhook secret**: Add a secure custom secret
 3. **Permissions**:
    - Pull requests: Read & Write
    - Contents: Read
@@ -105,7 +105,7 @@ OPENAI_API_KEY=sk-...
 
 # Optional
 WEB_PORT=3000
-GITHUB_BOT_HANDLE=your_bot_username
+GITHUB_BOT_HANDLE=your_bot_username  # GitHub username of your bot app (to detect @mentions and avoid self-replies)
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3
 API_KEY=your_secure_key
