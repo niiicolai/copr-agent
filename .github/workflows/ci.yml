@@ -43,3 +43,4 @@ jobs:
         run: npm test
         env:
           REDIS_URL: redis://localhost:6379
+          GITHUB_PRIVATE_KEY: 123
