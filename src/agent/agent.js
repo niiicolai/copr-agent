@@ -29,7 +29,7 @@ middleware.push(createMiddleware({ name: "ToolLogger", afterModel: toolLoggerMid
 
 if (ENABLE_SHORT_TERM_MEMORY) {
   options.checkpointer = new MemorySaver();
-  middleware.push(createMiddleware({ name: "DeleteOldMessages", afterModel: createDeleteOldMessagesMiddleware(SHORT_TERM_MEMORY_MAX_MESSAGES) }));
+  middleware.push(createMiddleware({ name: "DeleteOldMessages", afterModel: createDeleteOldMessagesMiddleware }));
 }
 
 logger.info({

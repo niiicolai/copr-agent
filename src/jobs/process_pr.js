@@ -2,7 +2,7 @@ import { getInstallationToken, getPullRequestFiles, postReviewComments } from ".
 import { loadPrompt } from "../prompts/_loadPrompt.js";
 import { agent } from "../agent/agent.js";
 import logger from "../config/logger.js";
-import { checkTokenLimit, parseLLMJsonResponse, removeBotMention, filterAndBatchPRFiles } from "../utils/jobUtils.js";
+import { checkTokenLimit, parseLLMJsonResponse, filterAndBatchPRFiles } from "../utils/jobUtils.js";
 
 export async function processPR(payload) {
   const { repository, pull_request, installation } = payload;
@@ -32,10 +32,9 @@ export async function processPR(payload) {
     const comments = await reviewFilesWithLLM(batch, pullNumber, owner, repo, installation.id);
 
     for (const comment of comments) {
-      const sanitizedComment = removeBotMention(comment.comment);
       allComments.push({
         path: comment.filename,
-        body: sanitizedComment,
+        body: comment.comment,
         line: comment.line,
       });
     }
