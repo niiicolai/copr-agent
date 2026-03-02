@@ -7,7 +7,7 @@ import { z } from "zod";
 import logger from "../config/logger.js";
 
 const ENABLE_RAG_TOOL = parseInt(process.env.ENABLE_RAG_TOOL ?? 0) === 1;
-const OPENAI_EMBEDDING_MODEL = process.env.OPENAI_EMBEDDING_MODEL;
+const OPENAI_EMBEDDING_MODEL = process.env.OPENAI_EMBEDDING_MODEL || "text-embedding-3-small";
 const MONGODB_ATLAS_URI = process.env.MONGODB_ATLAS_URI;
 const MONGODB_ATLAS_DB_NAME = process.env.MONGODB_ATLAS_DB_NAME;
 const MONGODB_ATLAS_COLLECTION_NAME = process.env.MONGODB_ATLAS_COLLECTION_NAME;
@@ -50,14 +50,28 @@ const getVectorStore = async () => {
 
 export const retrieve = tool(
   async ({ query }) => {
-    const vectorStore = await getVectorStore();
-    const retrievedDocs = await vectorStore.similaritySearch(query, 2);
-    const serialized = retrievedDocs
-      .map(
-        (doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`
-      )
-      .join("\n");
-    return [serialized, retrievedDocs];
+    try {
+      const vectorStore = await getVectorStore();
+      logger.info({ query }, "RAG: Performing similarity search");
+      
+      const retrievedDocs = await vectorStore.similaritySearch(query, 2);
+      
+      logger.info({ numDocs: retrievedDocs.length }, "RAG: Retrieved documents");
+      
+      if (retrievedDocs.length === 0) {
+        return "No relevant documents found.";
+      }
+      
+      const serialized = retrievedDocs
+        .map(
+          (doc) => `Source: ${doc.metadata.source}\nContent: ${doc.pageContent}`
+        )
+        .join("\n");
+      return [serialized, retrievedDocs];
+    } catch (error) {
+      logger.error({ error: error.message, stack: error.stack }, "RAG: Error retrieving documents");
+      return `Error retrieving documents: ${error.message}`;
+    }
   },
   {
     name: "retrieve",
@@ -68,7 +82,11 @@ export const retrieve = tool(
 );
 
 export async function splitAndStoreDocuments(docs) {
+  logger.info({ numDocs: docs.length }, "RAG: Splitting documents");
   const allSplits = await splitter.splitDocuments(docs);
+  logger.info({ numSplits: allSplits.length }, "RAG: Document splits");
+  
   const vectorStore = await getVectorStore();
   await vectorStore.addDocuments(allSplits);
+  logger.info({ numStored: allSplits.length }, "RAG: Documents stored");
 }
