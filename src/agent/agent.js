@@ -11,7 +11,7 @@ import {
 } from "./middleware.js";
 
 let checkpointer = null;
-async function getCheckpointer() {
+function getCheckpointer() {
   if (!checkpointer) {
     checkpointer = SqliteSaver.fromConnString(
       process.env.SQLITE_CHECKPOINT_PATH || "./checkpoints.db"
