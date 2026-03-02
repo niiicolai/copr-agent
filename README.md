@@ -83,13 +83,13 @@ Configure file limits and batch sizes to optimize API usage and avoid rate limit
 ## Examples
 
 ### General Security Issues
-![General security demo](/examples/general-security-demo.png)
+![General security demo](/review-agent/examples/general-security-demo.png)
 
 ### Get latest documentation using MCP
-![Latest docs MCP demo](/examples/latest-docs-mcp-demo.png)
+![Latest docs MCP demo](/review-agent/examples/latest-docs-mcp-demo.png)
 
 ### Use internal business logic with RAG
-![Internal docs RAG demo](/examples/internal-docs-rag-demo.png)
+![Internal docs RAG demo](/review-agent/examples/internal-docs-rag-demo.png)
 
 <br />
 
