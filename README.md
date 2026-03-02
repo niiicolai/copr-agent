@@ -13,7 +13,7 @@
 
 <br />
 
-**Review Agent** is an AI-powered code review assistant that automatically reviews pull requests and replies to comments using LLMs. Think of it as an always-available senior engineer on your team.
+**Review Agent** is an AI-powered code review assistant that automatically reviews pull requests and replies to comments using LLMs.
 
 <br />
 
