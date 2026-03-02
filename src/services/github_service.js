@@ -9,7 +9,7 @@ const GITHUB_PRIVATE_KEY = process.env.GITHUB_PRIVATE_KEY
     : fs.readFileSync(path.join(process.cwd(), "private-key.pem"), "utf8");
 
 export async function getInstallationToken(installationId) {
-  console.log(installationId)
+
     const appJwt = jwt.sign(
         {
             iat: Math.floor(Date.now() / 1000) - 60,
@@ -37,6 +37,7 @@ export async function getInstallationToken(installationId) {
     }
 
     const data = await res.json();
+
     return data.token;
 }
 
@@ -114,7 +115,7 @@ export async function postComment({ token, owner, repo, issueNumber, body }) {
 export async function searchCode({ token, owner, repo, query }) {
 
   const res = await fetch(
-    `${GITHUB_API}/search/code?q=${encodeURIComponent(query)}+repo:${owner}/${repo}`,
+    `${GITHUB_API}/search/code?q=${encodeURIComponent(`${query} in:file repo:${owner}/${repo}`)}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -127,7 +128,6 @@ export async function searchCode({ token, owner, repo, query }) {
     const err = await res.json();
     throw new Error(`Search failed: ${JSON.stringify(err)}`);
   }
-
   return res.json();
 }
 
