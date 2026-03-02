@@ -18,6 +18,8 @@ const optionalEnvVars = [
   'SHORT_MEMORY_MAX_MESSAGES',
   'OLLAMA_URL',
   'OLLAMA_MODEL',
+  'MONGODB_URL',
+  'SQLITE_CHECKPOINT_PATH',
 ];
 
 export function validateConfig() {

@@ -105,6 +105,7 @@ OPENAI_API_KEY=sk-...
 
 # Optional
 WEB_PORT=3000
+SQLITE_CHECKPOINT_PATH=./checkpoints.db
 GITHUB_BOT_HANDLE=your_bot_username  # GitHub username of your bot app (to detect @mentions and avoid self-replies)
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3
