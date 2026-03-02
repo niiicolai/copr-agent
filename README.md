@@ -64,8 +64,14 @@ Built-in Redis tracking shows exactly how many tokens you're spending.
 ### Code Search
 The agent can search your codebase directly to find relevant code and answer questions about your project.
 
+### RAG Support
+Give the agent access to search a vector database for internal docs.
+
 ### Rate Limiting & Batching
 Configure file limits and batch sizes to optimize API usage and avoid rate limits.
+
+### Customizable
+Configure the vector store, LLM, and embeddings models to suit your needs.
 
 <br />
 
@@ -255,6 +261,10 @@ ENABLE_SHORT_TERM_MEMORY=1
 ```
 
 ### MCP Servers
+When `ENABLE_MCP_CLIENT=1` is set, the agent got access to tools provided by the specified MCP servers.
+
+- **Purpose**: Enables the agent to get the latest documentation from various external and internal providers.
+
 Enable/disable:
 ```bash
 ENABLE_MCP_CLIENT=1  # default: disabled
@@ -294,4 +304,5 @@ Contributions are welcome! Feel free to open issues and pull requests.
 
 ## License
 
-MIT
+[See LICENSE.md](/LICENSE.md)
+
