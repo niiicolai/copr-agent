@@ -1,10 +1,24 @@
-import { MemorySaver } from "@langchain/langgraph";
 import { createAgent, createMiddleware } from "langchain";
+import { SqliteSaver } from "@langchain/langgraph-checkpoint-sqlite";
 import { tools as mcpTools } from "./mcpClient.js";
 import { searchCode, getFileContent } from "./tools.js";
 import { model } from "./llm.js";
 import logger from "../config/logger.js";
-import { tokenTrackingMiddleware, toolLoggerMiddleware, createDeleteOldMessagesMiddleware } from "./middleware.js";
+import { 
+  tokenTrackingMiddleware, 
+  toolLoggerMiddleware, 
+  createDeleteOldMessagesMiddleware 
+} from "./middleware.js";
+
+let checkpointer = null;
+function getCheckpointer() {
+  if (!checkpointer) {
+    checkpointer = SqliteSaver.fromConnString(
+      process.env.SQLITE_CHECKPOINT_PATH || "./checkpoints.db"
+    );
+  }
+  return checkpointer;
+}
 
 const middleware = [];
 const tools = [];
@@ -24,12 +38,24 @@ if (ENABLE_MCP_CLIENT) {
   tools.push(...mcpTools);
 }
 
-middleware.push(createMiddleware({ name: "TokenTracking", afterModel: tokenTrackingMiddleware }));
-middleware.push(createMiddleware({ name: "ToolLogger", afterModel: toolLoggerMiddleware }));
+middleware.push(createMiddleware({ 
+  name: "TokenTracking", 
+  afterModel: tokenTrackingMiddleware 
+}));
+
+if (tools.length > 0) {
+  middleware.push(createMiddleware({ 
+    name: "ToolLogger", 
+    afterModel: toolLoggerMiddleware 
+  }));
+}
 
 if (ENABLE_SHORT_TERM_MEMORY) {
-  options.checkpointer = new MemorySaver();
-  middleware.push(createMiddleware({ name: "DeleteOldMessages", beforeModel: createDeleteOldMessagesMiddleware }));
+  options.checkpointer = getCheckpointer();
+  middleware.push(createMiddleware({ 
+    name: "DeleteOldMessages", 
+    beforeModel: createDeleteOldMessagesMiddleware 
+  }));
 }
 
 logger.info({
