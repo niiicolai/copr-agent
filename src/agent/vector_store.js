@@ -4,6 +4,22 @@ import { OpenAIEmbeddings } from "@langchain/openai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { tool } from "@langchain/core/tools";
 import { z } from "zod";
+import logger from "../config/logger.js";
+
+const ENABLE_RAG_TOOL = parseInt(process.env.ENABLE_RAG_TOOL ?? 0) === 1;
+const OPENAI_EMBEDDING_MODEL = process.env.OPENAI_EMBEDDING_MODEL;
+const MONGODB_ATLAS_URI = process.env.MONGODB_ATLAS_URI;
+const MONGODB_ATLAS_DB_NAME = process.env.MONGODB_ATLAS_DB_NAME;
+const MONGODB_ATLAS_COLLECTION_NAME = process.env.MONGODB_ATLAS_COLLECTION_NAME;
+
+if (ENABLE_RAG_TOOL && (!OPENAI_EMBEDDING_MODEL || !MONGODB_ATLAS_URI || !MONGODB_ATLAS_DB_NAME || !MONGODB_ATLAS_COLLECTION_NAME)) {
+  logger.error({
+    OPENAI_EMBEDDING_MODEL,
+    MONGODB_ATLAS_URI,
+    MONGODB_ATLAS_DB_NAME,
+    MONGODB_ATLAS_COLLECTION_NAME,
+  }, "An environment variable is missing for the RAG implementation");
+}
 
 const splitter = new RecursiveCharacterTextSplitter({
   chunkSize: 1000,
@@ -14,14 +30,13 @@ let vectorStore = null;
 
 const getVectorStore = async () => {
   if (vectorStore) return vectorStore;
-
   const embeddings = new OpenAIEmbeddings({
-    model: process.env.OPENAI_EMBEDDING_MODEL
+    model: OPENAI_EMBEDDING_MODEL
   });
-  const client = new MongoClient(process.env.MONGODB_ATLAS_URI);
+  const client = new MongoClient(MONGODB_ATLAS_URI);
   const collection = client
-    .db(process.env.MONGODB_ATLAS_DB_NAME)
-    .collection(process.env.MONGODB_ATLAS_COLLECTION_NAME);
+    .db(MONGODB_ATLAS_DB_NAME)
+    .collection(MONGODB_ATLAS_COLLECTION_NAME);
 
   vectorStore = new MongoDBAtlasVectorSearch(embeddings, {
     collection: collection,
