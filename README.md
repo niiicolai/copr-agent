@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=0:11a8c7,100:5e17eb&height=300&section=header&text=CoPR%20Agent&fontSize=80&animation=fadeIn&fontAlignY=35" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:11a8c7,100:5e17eb&height=300&section=header&text=CoPR%20Agent&fontSize=80&animation=fadeIn&fontAlignY=35" />
 </h1>
 
 <div align="center">
